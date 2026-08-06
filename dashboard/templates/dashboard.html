@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee Analytics Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.27.1.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <span class="logo-icon">☕</span>
+                <div>
+                    <h1 class="dashboard-title">Coffee Analytics</h1>
+                    <p class="dashboard-subtitle">Social Media Insights Dashboard</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button id="btn-scrape" class="btn btn-primary" onclick="triggerScrape()">
+                    <span class="btn-icon">🔄</span> Scrape Now
+                </button>
+                <div class="scrape-status" id="scrape-status">
+                    <span class="status-dot idle"></span>
+                    <span id="status-text">Idle</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Summary Cards -->
+    <section class="summary-section">
+        <div class="container">
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="card-icon posts-icon">📊</div>
+                    <div class="card-content">
+                        <span class="card-value" id="total-posts">—</span>
+                        <span class="card-label">Total Posts</span>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="card-icon drinks-icon">🍵</div>
+                    <div class="card-content">
+                        <span class="card-value" id="unique-drinks">—</span>
+                        <span class="card-label">Drink Types</span>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="card-icon sentiment-icon">😊</div>
+                    <div class="card-content">
+                        <span class="card-value" id="avg-sentiment">—</span>
+                        <span class="card-label">Avg Sentiment</span>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="card-icon engagement-icon">🔥</div>
+                    <div class="card-content">
+                        <span class="card-value" id="avg-engagement">—</span>
+                        <span class="card-label">Avg Engagement</span>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="card-icon positive-icon">✅</div>
+                    <div class="card-content">
+                        <span class="card-value" id="positive-pct">—</span>
+                        <span class="card-label">Positive %</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Charts Section -->
+    <main class="charts-section">
+        <div class="container">
+            <!-- Row 1: Popular Drinks & Sentiment -->
+            <div class="chart-row">
+                <div class="chart-card wide">
+                    <div class="chart-header">
+                        <h2>Most Popular Coffee Drinks</h2>
+                        <span class="chart-badge">Bar Chart</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="drinkChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h2>Sentiment Breakdown</h2>
+                        <span class="chart-badge">Pie Chart</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="sentimentChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2: Peak Hours & Day Patterns -->
+            <div class="chart-row">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h2>Peak Drinking Hours</h2>
+                        <span class="chart-badge">Line Chart</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="hourChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h2>Day of Week Patterns</h2>
+                        <span class="chart-badge">Bar Chart</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="dayChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 3: Heatmap & Age Distribution -->
+            <div class="chart-row">
+                <div class="chart-card wide">
+                    <div class="chart-header">
+                        <h2>Activity Heatmap</h2>
+                        <span class="chart-badge">Day × Hour</span>
+                    </div>
+                    <div class="chart-container" id="heatmap-container"></div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h2>Age Group Distribution</h2>
+                        <span class="chart-badge">Doughnut</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="ageChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 4: Engagement & Trending -->
+            <div class="chart-row">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h2>Engagement by Drink Type</h2>
+                        <span class="chart-badge">Horizontal Bar</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="engagementChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h2>Trending Keywords</h2>
+                        <span class="chart-badge">Tag Cloud</span>
+                    </div>
+                    <div class="chart-container" id="keywords-container">
+                        <div class="keyword-cloud" id="keyword-cloud"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 5: Source Breakdown & Sentiment Over Time -->
+            <div class="chart-row">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h2>Source Breakdown</h2>
+                        <span class="chart-badge">Grouped Bar</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="sourceChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h2>Sentiment Over Time</h2>
+                        <span class="chart-badge">Area Chart</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="sentimentTimeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Posts Table -->
+            <div class="chart-row">
+                <div class="chart-card full-width">
+                    <div class="chart-header">
+                        <h2>Recent Posts</h2>
+                        <div class="filter-controls">
+                            <select id="filter-source" onchange="loadPosts()">
+                                <option value="">All Sources</option>
+                                <option value="reddit">Reddit</option>
+                                <option value="twitter">Twitter</option>
+                                <option value="instagram">Instagram</option>
+                            </select>
+                            <select id="filter-sentiment" onchange="loadPosts()">
+                                <option value="">All Sentiments</option>
+                                <option value="positive">Positive</option>
+                                <option value="neutral">Neutral</option>
+                                <option value="negative">Negative</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="posts-table-container">
+                        <table class="posts-table" id="posts-table">
+                            <thead>
+                                <tr>
+                                    <th>Source</th>
+                                    <th>Post Text</th>
+                                    <th>Drink Types</th>
+                                    <th>Sentiment</th>
+                                    <th>Engagement</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="posts-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="dashboard-footer">
+        <div class="container">
+            <p>Coffee Analytics Platform v1.0 | Data from public social media posts only</p>
+            <p>Last updated: <span id="last-updated">—</span></p>
+        </div>
+    </footer>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>
