@@ -1,13 +1,12 @@
 """
 Coffee Analytics Platform - Main Entry Point
-Initializes the application, runs the scraper, processes data,
-and starts the FastAPI server with the dashboard.
+Initializes the database and starts the FastAPI server with the dashboard.
+Data scraping is triggered on-demand via the /api/scrape endpoint.
 """
 
 import os
 import sys
 import logging
-import threading
 import uvicorn
 
 # Add project root to path
@@ -15,8 +14,6 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from config import DASHBOARD_PORT, DEBUG_MODE
 from models import init_db
-from processor.pipeline import ProcessingPipeline
-from scraper.orchestrator import ScraperOrchestrator
 
 # Configure logging
 logging.basicConfig(
@@ -26,29 +23,10 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def run_initial_scrape():
-    """Run initial data collection in a background thread."""
-    try:
-        logger.info("Running initial data collection...")
-        scraper = ScraperOrchestrator()
-        pipeline = ProcessingPipeline()
-
-        raw_posts = scraper.scrape_all()
-        logger.info(f"Collected {len(raw_posts)} raw posts from all sources.")
-
-        if raw_posts:
-            stats = pipeline.process_and_save(raw_posts)
-            logger.info(f"Processing stats: {stats}")
-        else:
-            logger.warning("No posts collected.")
-    except Exception as e:
-        logger.error(f"Initial scrape failed: {e}")
-
-
 def main():
     """Main entry point for the Coffee Analytics Platform."""
     print("=" * 60)
-    print("  ☕ Coffee Analytics Platform v1.0")
+    print("  Coffee Analytics Platform v1.0")
     print("  Social Media Data Scraper & Analytics Dashboard")
     print("=" * 60)
 
@@ -57,21 +35,22 @@ def main():
     init_db()
     logger.info("Database ready.")
 
-    # Step 2: Start the FastAPI server immediately
-    print(f"\n  Dashboard available at: http://localhost:{DASHBOARD_PORT}")
-    print(f"  API docs available at:  http://localhost:{DASHBOARD_PORT}/docs")
+    # Step 2: Determine port (Railway injects PORT env var)
+    port = int(os.getenv("PORT", DASHBOARD_PORT))
+    logger.info(f"Starting server on port {port}...")
+
+    print(f"\n  Dashboard available at: http://localhost:{port}")
+    print(f"  API docs available at:  http://localhost:{port}/docs")
+    print(f"  Scraping via:           POST http://localhost:{port}/api/scrape")
     print(f"\n{'=' * 60}\n")
 
-    # Step 3: Run scraping in background thread
-    scrape_thread = threading.Thread(target=run_initial_scrape, daemon=True)
-    scrape_thread.start()
-
-    # Step 4: Start uvicorn server
+    # Step 3: Start uvicorn server
+    # Scraping is triggered on-demand via POST /api/scrape
     uvicorn.run(
         "api.app:app",
         host="0.0.0.0",
-        port=DASHBOARD_PORT,
-        reload=DEBUG_MODE,
+        port=port,
+        reload=False,
         log_level="info"
     )
 
