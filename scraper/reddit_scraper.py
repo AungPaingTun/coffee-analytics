@@ -180,10 +180,13 @@ class RedditScraper:
                 sentiments, weights=[0.6, 0.3, 0.1], k=1
             )[0]
 
+            # Use valid Reddit URLs pointing to real r/coffee subreddit
+            # so links are clickable and lead to a real page
+            subreddit_name = random.choice(self.SUBREDDITS[:5])
             posts.append({
                 "source": "reddit",
                 "post_id": f"reddit_mock_{i}",
-                "platform_url": f"https://reddit.com/r/coffee/comments/mock_{i}",
+                "platform_url": f"https://www.reddit.com/r/{subreddit_name}/",
                 "author": f"u_mock_user_{i}",
                 "text": text,
                 "timestamp": datetime.now(timezone.utc).replace(

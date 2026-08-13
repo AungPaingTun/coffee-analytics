@@ -217,7 +217,7 @@ class TwitterScraper:
             posts.append({
                 "source": "twitter",
                 "post_id": f"twitter_mock_{i}",
-                "platform_url": f"https://twitter.com/i/status/mock_{i}",
+                "platform_url": f"https://x.com/search?q=coffee&src=typed_query",
                 "author": f"tw_mock_user_{i}",
                 "text": random.choice(mock_texts),
                 "timestamp": datetime.now(timezone.utc).replace(
