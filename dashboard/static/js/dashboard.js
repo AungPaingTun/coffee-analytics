@@ -90,14 +90,24 @@ async function fetchJSON(url) {
 }
 
 function showLoading() {
+    // Don't replace innerHTML - it destroys canvas elements!
+    // Instead, just add a loading overlay without removing canvases.
     document.querySelectorAll('.chart-container').forEach(el => {
-        el.innerHTML = '<div class="loading">Loading</div>';
+        // Only show loading on containers that have a canvas
+        const canvas = el.querySelector('canvas');
+        if (canvas) {
+            canvas.style.opacity = '0.3';
+        }
     });
 }
 
 function showError(message) {
+    // Only show error in containers that have a canvas (don't destroy them)
     document.querySelectorAll('.chart-container').forEach(el => {
-        el.innerHTML = `<div class="loading" style="color: var(--danger);">Error: ${message}</div>`;
+        const canvas = el.querySelector('canvas');
+        if (canvas) {
+            canvas.style.opacity = '0.3';
+        }
     });
 }
 
