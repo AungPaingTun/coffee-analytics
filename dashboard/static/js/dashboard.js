@@ -645,9 +645,23 @@ function renderPostsTable(data) {
             month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
         }) : '—';
         
-        const sourceUrl = post.platform_url || post.url || '';
+        // Generate real search URLs based on the post content
+        // For Reddit: search r/coffee for the drink type mentioned
+        // For Twitter/X: search for the drink type mentioned
+        const drinkType = (post.drink_types && post.drink_types.length > 0) ? post.drink_types[0] : 'coffee';
+        const searchText = encodeURIComponent(drinkType);
+        
+        let sourceUrl = '';
+        if (post.source === 'reddit') {
+            sourceUrl = `https://www.reddit.com/r/coffee/search?q=${searchText}&restrict_sr=1&sort=new`;
+        } else if (post.source === 'twitter') {
+            sourceUrl = `https://x.com/search?q=${searchText}&src=typed_query&f=live`;
+        } else if (post.source === 'instagram') {
+            sourceUrl = `https://www.instagram.com/explore/tags/${searchText.toLowerCase().replace(/\s+/g, '')}/`;
+        }
+        
         const sourceLink = sourceUrl 
-            ? `<a href="${sourceUrl}" target="_blank" rel="noopener noreferrer" class="source-link"><span class="source-badge ${post.source}">${post.source}</span></a>`
+            ? `<a href="${sourceUrl}" target="_blank" rel="noopener noreferrer" class="source-link" title="Search ${post.source} for '${drinkType}'"><span class="source-badge ${post.source}">${post.source}</span></a>`
             : `<span class="source-badge ${post.source}">${post.source}</span>`;
         
         return `
