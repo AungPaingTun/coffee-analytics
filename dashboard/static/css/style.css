@@ -522,3 +522,17 @@ body {
         font-size: 1.4rem;
     }
 }
+
+/* Source badge clickable link */
+.source-link {
+    text-decoration: none;
+    color: inherit;
+}
+.source-link:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+}
+.source-link:hover .source-badge {
+    text-decoration: underline;
+    box-shadow: 0 0 8px rgba(111, 78, 55, 0.3);
+}

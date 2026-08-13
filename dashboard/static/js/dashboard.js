@@ -645,9 +645,14 @@ function renderPostsTable(data) {
             month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
         }) : '—';
         
+        const sourceUrl = post.platform_url || post.url || '';
+        const sourceLink = sourceUrl 
+            ? `<a href="${sourceUrl}" target="_blank" rel="noopener noreferrer" class="source-link"><span class="source-badge ${post.source}">${post.source}</span></a>`
+            : `<span class="source-badge ${post.source}">${post.source}</span>`;
+        
         return `
             <tr>
-                <td><span class="source-badge ${post.source}">${post.source}</span></td>
+                <td>${sourceLink}</td>
                 <td class="post-text" title="${escapeHtml(post.text || '')}">${escapeHtml(truncate(post.text || '', 80))}</td>
                 <td>${drinks}</td>
                 <td><span class="sentiment-badge ${post.sentiment}">${post.sentiment}</span></td>
